@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+// App.js 파일을 root라는 id값을 가지는곳에 출력해라.
 ReactDOM.render(
   <React.StrictMode>
     <App />
