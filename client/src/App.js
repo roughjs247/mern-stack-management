@@ -7,6 +7,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import {withStyles} from '@material-ui/core/styles';
 
 const styles = thema => ({
@@ -17,6 +18,9 @@ const styles = thema => ({
   },
   table : {
     minWidth : 1080
+  },
+  progress : {
+    margin : thema.spacing(2)
   }
 });
 
@@ -25,11 +29,14 @@ class App extends Component{
 
   // class형 컴포넌트에서 state를 통해 유동적인 Data를 다룰수 있다.
   state = {
-    customers : ""
+    customers : "",
+    completed : 0 // progress 0 - 100%
   }
   // api서버에서 데이터를 받아올때 실행 (모든 컴포넌트가 마운트가 다 됬을때 실행) 
-  // callApi를 호출해서 해당 url 주소에 데이터를 요청하고 받아온(res) 데이터를 state의 customer 변수에 넣어준다.
+  // componentDidMount 시점에 비동기 함수를 호출해서 해당 url 주소에 데이터를 요청하고 받아온(res) 데이터를 state의 customer 변수에 넣어준다.
   componentDidMount() {
+    this.timer = setInterval( this.progress, 20); // progressbar가 0.2초마다 1번씩 수행됨.
+    // node api 서버에서 Data를 비동기로 가져온다.
     this.callApi()
         .then(res => this.setState({customers : res}))
         .catch(err => console.log(err));
@@ -39,6 +46,11 @@ class App extends Component{
     const response = await fetch('/api/customers'); // 해당 경로의 Data를 비동기로 가져온다. http:localhost:5000/api/customers (BASE => setupProxy.json : proxy)
     const body = await response.json();             // 가져온 Data를 json형태로 body에 넣어준다.
     return body;
+  }
+
+  progress = () => {
+    const { completed } = this.state;
+    this.setState({ completed : completed >= 100 ? 0 : completed + 1 });
   }
 
   render(){
@@ -59,7 +71,11 @@ class App extends Component{
           <TableBody>
             { this.state.customers ? this.state.customers.map(c => {
                  return ( <Customer key={c.id} id={c.id} image={c.image} name={c.name}  birthday={c.birthday} gender={c.gender} job={c.job} /> ) })  
-                : ""
+               : <TableRow>
+                   <TableCell colSpan="6" align="center">
+                     <CircularProgress className={classes.progress} variant="determinate" value={this.state.completed} />
+                 </TableCell>
+                 </TableRow>
              }
           </TableBody>
         </Table>  
