@@ -18,37 +18,29 @@ const styles = thema => ({
   table : {
     minWidth : 1080
   }
-})
-
-const customers = [
-    {
-    'id'   : 1,
-    'image': 'https://placeimg.com/64/64/any',
-    'name' : '이용빈',
-    'birthday' : '900918',
-    'gender' : 'male',
-    'job'    : 'developer',
-    },
-    {
-      'id'   : 2,
-      'image': 'https://placeimg.com/64/64/1',
-      'name' : '홍길동',
-      'birthday' : '131244',
-      'gender' : 'female',
-      'job'    : 'student',
-      },
-      {
-        'id'   : 3,
-        'image': 'https://placeimg.com/64/64/2',
-        'name' : '김길수',
-        'birthday' : '515122',
-        'gender' : 'male',
-        'job'    : 'photograper',
-        },          
-];
-
+});
 
 class App extends Component{
+  // this는 App
+
+  // class형 컴포넌트에서 state를 통해 유동적인 Data를 다룰수 있다.
+  state = {
+    customers : ""
+  }
+  // api서버에서 데이터를 받아올때 실행 (모든 컴포넌트가 마운트가 다 됬을때 실행) 
+  // callApi를 호출해서 해당 url 주소에 데이터를 요청하고 받아온(res) 데이터를 state의 customer 변수에 넣어준다.
+  componentDidMount() {
+    this.callApi()
+        .then(res => this.setState({customers : res}))
+        .catch(err => console.log(err));
+  }
+
+  callApi = async() => {
+    const response = await fetch('/api/customers'); // 해당 경로의 Data를 비동기로 가져온다. http:localhost:5000/api/customers (BASE => setupProxy.json : proxy)
+    const body = await response.json();             // 가져온 Data를 json형태로 body에 넣어준다.
+    return body;
+  }
+
   render(){
     const {classes} = this.props;
     return(
@@ -65,7 +57,10 @@ class App extends Component{
             </TableRow>
           </TableHead>
           <TableBody>
-            { customers.map(c => { return ( <Customer key={c.id} id={c.id} image={c.image} name={c.name}  birthday={c.birthday} gender={c.gender} job={c.job} /> ) })  }
+            { this.state.customers ? this.state.customers.map(c => {
+                 return ( <Customer key={c.id} id={c.id} image={c.image} name={c.name}  birthday={c.birthday} gender={c.gender} job={c.job} /> ) })  
+                : ""
+             }
           </TableBody>
         </Table>  
       </Paper>  
