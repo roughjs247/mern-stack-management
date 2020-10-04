@@ -3,9 +3,10 @@ import React from 'react';
 class CustomerDelete extends React.Component {
 
     deleteCustomer(id) {
-        const url = '/api/customers/' + id;
-        fetch(url, {  method : 'DELETE' });
-        this.props.stateRefresh(); 
+        const url = `/api/customer/${id}`;
+        fetch(url, { method: 'DELETE' }).then(() => {
+            this.props.stateRefresh();
+        });
     }
 
     render() {

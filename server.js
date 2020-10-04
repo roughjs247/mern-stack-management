@@ -35,6 +35,7 @@ app.get('/api/customers', (req,res) => {
 app.use('/image',express.static('./upload')); // image url로 접근시  upload 폴더로 접근 되도록 설정
 // post 
 app.use('/api/customers', upload.single('image'), (req,res) => {
+    console.log('INSERT => /api/customers');
     let sql = "INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?, now(), 0)";
     let image = '/image/' + req.file.filename;  //database에 해당 이미지 경로
     let name = req.body.name;
@@ -52,7 +53,8 @@ app.use('/api/customers', upload.single('image'), (req,res) => {
 });
 
 //delete
-app.delete('/api/customers/:id', (req,res) => {
+app.delete('/api/customer/:id', (req,res) => {
+    console.log('DELETE => /api/customers/' + req.params.id);
     let sql = 'UPDATE CUSTOMER SET isDeleted = 1 WHERE id = ?';
     let params = [req.params.id];
     console.log(params);
