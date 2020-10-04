@@ -19,7 +19,7 @@ class CustomerAdd extends React.Component {
         e.preventDefault()
         this.addCustomer().then((response) => {
                 console.log(response.data);
-                this.props.stateRefresh(); // 고객 목록을 추가한 이후, -> 서버로 부터 상태에 대한 응답을 다시 받은후 고객 목록을 다시 출력한다.
+                this.props.stateRefresh(); // 고객 목록을 추가한 이후, -> 서버로 부터 상태에 대한 응답을 다시 받은후 고객 목록을 뿌려준다.
             })
         this.setState({
             file : null,
@@ -29,14 +29,14 @@ class CustomerAdd extends React.Component {
             job : '',
             fileName :''
         })   
-    }
+    };
 
     handleFileChange = (e) => {
         this.setState({
             file : e.target.files[0],
             fileName : e.target.value
         })
-    }
+    };
 
     handleValueChange = (e) => {
         let nextState ={};
@@ -44,7 +44,7 @@ class CustomerAdd extends React.Component {
         this.setState(nextState);
     }
 
-    addCustomer = () => {
+    addCustomer = async () => {
         const url = '/api/customers';
         const formData = new FormData();
         formData.append('image', this.state.file);
@@ -52,12 +52,8 @@ class CustomerAdd extends React.Component {
         formData.append('birthday', this.state.birthday);
         formData.append('gender', this.state.gender);
         formData.append('job', this.state.job);
-        const config = {
-            headers : {
-                'content-type' : 'multipart/form-data'
-            }
-        }
-        return post(url, formData, config);
+        const config = { headers : { 'content-type' : 'multipart/form-data' } };
+        return await post(url, formData, config); // 서버로 Post 방식으로 Data를 보낸다.
     }
 
     render() {

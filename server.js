@@ -26,16 +26,16 @@ const upload = multer({dest : './upload'});
 
 //get List
 app.get('/api/customers', (req,res) => {
-    connection.query("SELECT * FROM CUSTOMER", (err, rows, fields) => {
+    connection.query("SELECT * FROM CUSTOMER WHERE isDeleted = 0", (err, rows, fields) => {
         res.send(rows);
     });
 });
 
-//post
-app.use('/image',express.static('./upload')); // image url로 접근시  upload 폴더로 접근 되도록..
-
+// public 설정 (이미지 저장 경로)
+app.use('/image',express.static('./upload')); // image url로 접근시  upload 폴더로 접근 되도록 설정
+// post 
 app.use('/api/customers', upload.single('image'), (req,res) => {
-    let sql = "INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?)";
+    let sql = "INSERT INTO CUSTOMER VALUES (null, ?, ?, ?, ?, ?, now(), 0)";
     let image = '/image/' + req.file.filename;  //database에 해당 이미지 경로
     let name = req.body.name;
     let birthday = req.body.birthday;
@@ -43,8 +43,27 @@ app.use('/api/customers', upload.single('image'), (req,res) => {
     let job = req.body.job;
     let params = [ image, name, birthday, gender, job]; // (null, image, name, birthday, gender, job)  ? 에 순서대로 매핑
     connection.query(sql, params, (err,rows,fields) => {
+        if(err){
+            res.send(err);
+            return ;
+        }
         res.send(rows);
     });
 });
+
+//delete
+app.delete('/api/customers/:id', (req,res) => {
+    let sql = 'UPDATE CUSTOMER SET isDeleted = 1 WHERE id = ?';
+    let params = [req.params.id];
+    console.log(params);
+    connection.query(sql, params, (err, rows, fields) => {
+        if(err){
+            res.send(err);
+            return ;
+        };
+        res.send(rows);
+    });
+});
+
 
 app.listen(port, () => console.log(`Node server start! ${port}`));
