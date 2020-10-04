@@ -1,5 +1,6 @@
 import React,{Component} from 'react';
 import Customer from './components/Customer';
+import CustomerAdd from './components/CustomerAdd';
 import './App.css';
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -27,11 +28,26 @@ const styles = thema => ({
 class App extends Component{
   // this는 App
 
-  // class형 컴포넌트에서 state를 통해 유동적인 Data를 다룰수 있다.
-  state = {
-    customers : "",
-    completed : 0 // progress 0 - 100%
+  constructor(props) {
+    super(props);
+    this.state = {
+      customers : '',
+      completed : 0 
+    }
   }
+  // state refresh
+  stateRefresh = () => {
+    // state init
+    this.setState({
+      customers : '',
+      completed : 0
+    });
+    //DB에 저장되어있는 state를 다시 가져온다.
+    this.callApi()
+    .then(res => this.setState({customers : res}))
+    .catch(err => console.log(err));
+  }
+
   // api서버에서 데이터를 받아올때 실행 (모든 컴포넌트가 마운트가 다 됬을때 실행) 
   // componentDidMount 시점에 비동기 함수를 호출해서 해당 url 주소에 데이터를 요청하고 받아온(res) 데이터를 state의 customer 변수에 넣어준다.
   componentDidMount() {
@@ -56,6 +72,7 @@ class App extends Component{
   render(){
     const {classes} = this.props;
     return(
+      <div>
       <Paper className={classes.root}>
         <Table className={classes.table}>
           <TableHead>
@@ -79,7 +96,9 @@ class App extends Component{
              }
           </TableBody>
         </Table>  
-      </Paper>  
+      </Paper> 
+      <CustomerAdd stateRefresh={this.stateRefresh}/>
+      </div> 
     )
   }
 }
